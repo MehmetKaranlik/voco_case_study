@@ -15,6 +15,8 @@ import 'package:voco_case_study/product/widget/button/active_button.dart';
 import 'package:voco_case_study/product/widget/snackbar/product_snackbar.dart';
 import 'package:voco_case_study/product/widget/text_field/product_text_field.dart';
 
+typedef _ViewModel = StateNotifierProvider<LoginViewModel, LoginState>;
+
 @RoutePage(name: 'LoginScreen')
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -25,15 +27,13 @@ class LoginView extends ConsumerStatefulWidget {
 
 class _LoginViewState extends ConsumerState<LoginView> with _LoginOperations {
   late final ILoginService _service;
-  late final StateNotifierProvider<LoginViewModel, LoginState> _viewModel;
+  late final _ViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
     _service = LoginService();
-    _viewModel = StateNotifierProvider<LoginViewModel, LoginState>(
-      (ref) => LoginViewModel(service: _service),
-    );
+    _viewModel = _ViewModel((ref) => LoginViewModel(service: _service));
   }
 
   @override
@@ -42,45 +42,8 @@ class _LoginViewState extends ConsumerState<LoginView> with _LoginOperations {
     ref.listen<LoginState>(_viewModel, _listenForComplete);
     return Scaffold(
         body: SafeArea(
-      child: Form(
-        key: _globalKey,
-        child: Padding(
-          padding: const Paddings.allMedium(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const FlutterLogo(size: WidgetSizes.spacingXxl12),
-              const VerticalSpace.medium(),
-              ProductTextField(
-                controller: _emailController,
-                hint: StringKeys.email,
-                validator: ValidatorItems.validateEmail,
-              ),
-              const VerticalSpace.standard(),
-              ProductTextField(
-                controller: _passwordController,
-                hint: StringKeys.password,
-                validator: ValidatorItems.validatePassword,
-              ),
-              const VerticalSpace.medium(),
-              ActiveButton(
-                label: StringKeys.login,
-                onPressed: _onPressed,
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: _FormBody(_viewModel),
     ));
-  }
-
-  void _onPressed() async {
-    if (_globalKey.currentState?.validate() == false) return;
-    await ref.read(_viewModel.notifier).login(
-          _loginModel,
-          ref.read(userContextProvider.notifier),
-        );
   }
 
   void _listenForError(LoginState? prev, LoginState? next) {
@@ -105,7 +68,56 @@ class _LoginViewState extends ConsumerState<LoginView> with _LoginOperations {
   }
 }
 
-mixin _LoginOperations on ConsumerState<LoginView> {
+class _FormBody extends ConsumerWidget with _LoginOperations {
+  _FormBody(this.viewModel);
+
+  final _ViewModel viewModel;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Form(
+      key: _globalKey,
+      child: Padding(
+        padding: const Paddings.allMedium(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const FlutterLogo(size: WidgetSizes.spacingXxl12),
+            const VerticalSpace.medium(),
+            ProductTextField(
+              controller: _emailController,
+              hint: StringKeys.email,
+              validator: ValidatorItems.validateEmail,
+            ),
+            const VerticalSpace.standard(),
+            ProductTextField(
+              controller: _passwordController,
+              hint: StringKeys.password,
+              validator: ValidatorItems.validatePassword,
+            ),
+            const VerticalSpace.medium(),
+            ActiveButton(
+              onPressed: () => _onPressed(ref),
+              label: StringKeys.login,
+              //  onPressed: _onPressed,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onPressed(WidgetRef ref) async {
+    if (_globalKey.currentState?.validate() == false) return;
+    await ref.read(viewModel.notifier).login(
+          _loginModel,
+          ref.read(userContextProvider.notifier),
+        );
+  }
+}
+
+mixin _LoginOperations {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

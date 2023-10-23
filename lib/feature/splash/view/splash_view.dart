@@ -5,6 +5,8 @@ import 'package:voco_case_study/feature/splash/view_model/splash_view_model.dart
 import 'package:voco_case_study/product/database/locale_database.dart';
 import 'package:voco_case_study/product/init/navigation/app_router.dart';
 
+typedef _ViewModel = StateNotifierProvider<SplashViewModel, SplashState>;
+
 @RoutePage(name: 'SplashScreen')
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
@@ -13,12 +15,12 @@ class SplashView extends ConsumerStatefulWidget {
 }
 
 class _SplashViewState extends ConsumerState<SplashView> {
-  late final StateNotifierProvider<SplashViewModel, SplashState> _viewModel;
+  late final _ViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = StateNotifierProvider<SplashViewModel, SplashState>(
+    _viewModel = _ViewModel(
       (ref) => SplashViewModel(manager: SharedCacheManager.instance),
     );
   }

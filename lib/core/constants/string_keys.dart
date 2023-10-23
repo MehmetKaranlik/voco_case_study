@@ -5,4 +5,5 @@ class StringKeys {
   static const String email = 'Email';
   static const String password = 'Şifre';
   static const String login = 'GİRİŞ YAP';
+  static const String users = "Kullanıcılar";
 }

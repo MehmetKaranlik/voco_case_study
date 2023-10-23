@@ -3,11 +3,11 @@ part 'user_response.g.dart';
 
 @JsonSerializable()
 class UserResponse {
-  int? page;
-  int? perPage;
-  int? total;
-  int? totalPages;
-  List<User>? data;
+  final int? page;
+  final int? perPage;
+  final int? total;
+  final int? totalPages;
+  final List<User>? data;
 
   UserResponse({
     this.page,
@@ -41,11 +41,11 @@ class UserResponse {
 
 @JsonSerializable()
 class User {
-  int? id;
-  String? email;
-  String? firstName;
-  String? lastName;
-  String? avatar;
+  final int? id;
+  final String? email;
+  final String? firstName;
+  final String? lastName;
+  final String? avatar;
 
   User({
     this.id,
